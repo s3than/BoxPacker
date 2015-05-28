@@ -178,8 +178,8 @@
 
       $packedBoxes = new PackedBoxList;
 
-      $overWeightBoxes = [];
-      $underWeightBoxes = [];
+      $overWeightBoxes = array();
+      $underWeightBoxes = array();
       foreach ($aPackedBoxes as $packedBox) {
         $boxWeight = $packedBox->getWeight();
         if ($boxWeight > $targetWeight) {
@@ -226,8 +226,8 @@
                 $underWeightBoxes[$u] = $newLighterBox;
 
                 $tryRepack = true; //we did some work, so see if we can do even better
-                usort($overWeightBoxes, [$packedBoxes, 'reverseCompare']);
-                usort($underWeightBoxes, [$packedBoxes, 'reverseCompare']);
+                usort($overWeightBoxes, array($packedBoxes, 'reverseCompare'));
+                usort($underWeightBoxes, array($packedBoxes, 'reverseCompare'));
                 break 3;
               }
             }

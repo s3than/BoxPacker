@@ -26,7 +26,7 @@
      * @return array
      */
     public function asArray() {
-      $return = [];
+      $return = array();
       foreach (clone $this as $item) {
         $return[] = $item;
       }
