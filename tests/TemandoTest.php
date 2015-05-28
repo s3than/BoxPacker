@@ -2,10 +2,6 @@
 
 namespace DVDoug\BoxPacker;
 
-require "StdBox.php";
-require "StdItem.php";
-
-
 /* 
  * performs a bunch of additional tests to verify the correctness of the
  * box packer implimentation 
@@ -148,9 +144,9 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
         $packer->setAllowPartialResults(true);
         $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
-            2,
+            8,
             $packed->count(),
-            "Should have been able to fit maximum 2 "
+            "Should have been able to fit maximum 8 "
             . "items in this service box."
         );
     }
