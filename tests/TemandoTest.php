@@ -169,4 +169,34 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+
+  /**
+     * We expect this test to fail to pack all the boxes. More specifically,
+     * given our Box/Service dimensions we expect 5 boxes to fit in here...
+     */
+    public function testPackFailFour()
+    {
+        $mod = 1;
+        $service = new StdBox(
+            "Two Item Service",
+            self::SERVICE_WIDTH / $mod,
+            self::SERVICE_LENGTH / $mod,
+            self::SERVICE_HEIGHT / $mod,
+            0,
+            self::SERVICE_WIDTH / $mod,
+            self::SERVICE_LENGTH / $mod,
+            self::SERVICE_HEIGHT / $mod,
+            self::SERVICE_WEIGHT
+        );
+        $itemList = $this->getItemList(1);
+        $expected = $itemList->count() / $mod;
+        $packed = $this->packer->packBox($service, $itemList);
+        $this->assertEquals(
+            $expected,
+            $packed->count(),
+            "Should have been able to fit maximum $expected "
+            . "items in this service box."
+        );
+    }
+
 }
