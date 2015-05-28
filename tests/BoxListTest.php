@@ -20,7 +20,7 @@
       $list->insert($box2);
       $list->insert($box3);
 
-      $sorted = array();
+      $sorted = [];
       while (!$list->isEmpty()) {
         $sorted[] = $list->extract();
       }

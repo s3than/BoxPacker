@@ -33,17 +33,28 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
      *
      * @returns DVDoug\BoxPacker\ItemList
      */
-    public function getItemList($count)
+    protected function getItemList($count)
     {
         $itemList = new \DVDoug\BoxPacker\ItemList;
         for ($i=0;$i<$count;$i++) {
-            $box = new StdItem(
-                "test box",
+            $box = new TestItem(
+                'Le long box', 
                 self::BOX_WIDTH,
                 self::BOX_LENGTH,
                 self::BOX_HEIGHT,
                 self::BOX_WEIGHT
             );
+            /* $box = new StdItem( */
+            /*     "test box", */
+            /*     self::BOX_WIDTH, */
+            /*     self::BOX_LENGTH, */
+            /*     self::BOX_HEIGHT, */
+            /*     0, */
+            /*     self::BOX_WIDTH, */
+            /*     self::BOX_LENGTH, */
+            /*     self::BOX_HEIGHT, */
+            /*     self::BOX_WEIGHT */
+            /* ); */
             $itemList->insert($box);
         }
         return $itemList;
@@ -61,7 +72,7 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
     */
     public function testPackSuccess()
     {
-        $service = new StdBox(
+        $service = new TestBox(
             "One Item Service",
             self::SERVICE_WIDTH,
             self::SERVICE_LENGTH,
@@ -73,7 +84,9 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
             self::SERVICE_WEIGHT
         );
         $itemList = $this->getitemList(self::LIST_LENGTH);
-        $packed = $this->packer->packBox($service, $itemList);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
             10,
             $packed->count(),
@@ -88,7 +101,7 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
     public function testPackFailOne()
     {
         $mod = 10;
-        $service = new StdBox(
+        $service = new TestBox(
             "One Item Service",
             self::SERVICE_WIDTH / $mod,
             self::SERVICE_LENGTH / $mod,
@@ -101,11 +114,13 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
         );
         $itemList = $this->getItemList(self::LIST_LENGTH);
         $expected = $itemList->count() / $mod;
-        $packed = $this->packer->packBox($service, $itemList);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
-            $expected,
+            1,
             $packed->count(),
-            "Should have been able to fit maximum $expected "
+            "Should have been able to fit maximum 1 "
             . "items in this service box."
         );
     }
@@ -114,10 +129,10 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
      * We expect this test to fail to pack all the boxes. More specifically,
      * given our Box/Service dimensions we expect two boxes to fit in here...
      */
-    public function testPackFailTwo()
+    public function testTooManyItemsToFit()
     {
         $mod = 5;
-        $service = new StdBox(
+        $service = new TestBox(
             "Two Item Service",
             self::SERVICE_WIDTH / $mod,
             self::SERVICE_LENGTH / $mod,
@@ -129,25 +144,51 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
             self::SERVICE_WEIGHT
         );
         $itemList = $this->getItemList(10);
-        $expected = $itemList->count() / $mod;
-        $packed = $this->packer->packBox($service, $itemList);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
-            $expected,
+            2,
             $packed->count(),
-            "Should have been able to fit maximum $expected "
+            "Should have been able to fit maximum 2 "
             . "items in this service box."
         );
     }
 
+    public function testReasonableFit()
+    {
+        $mod = 1;
+        $service = new TestBox(
+            "Ten Item Service",
+            self::SERVICE_WIDTH / $mod,
+            self::SERVICE_LENGTH / $mod,
+            self::SERVICE_HEIGHT / $mod,
+            0,
+            self::SERVICE_WIDTH / $mod,
+            self::SERVICE_LENGTH / $mod,
+            self::SERVICE_HEIGHT / $mod,
+            self::SERVICE_WEIGHT
+        );
+        $itemList = $this->getItemList(8);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
+        $this->assertEquals(
+            8,
+            $packed->count(),
+            "Should have been able to fit a maximum of 8 "
+            . "items in this service box."
+        );
+    }
 
-  /**
+    /**
      * We expect this test to fail to pack all the boxes. More specifically,
      * given our Box/Service dimensions we expect 5 boxes to fit in here...
      */
-    public function testPackFailThree()
+    public function testExactMaxItemFit()
     {
         $mod = 2;
-        $service = new StdBox(
+        $service = new TestBox(
             "Two Item Service",
             self::SERVICE_WIDTH / $mod,
             self::SERVICE_LENGTH / $mod,
@@ -158,13 +199,15 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
             self::SERVICE_HEIGHT / $mod,
             self::SERVICE_WEIGHT
         );
-        $itemList = $this->getItemList(self::LIST_LENGTH);
+        $itemList = $this->getItemList(5);
         $expected = $itemList->count() / $mod;
-        $packed = $this->packer->packBox($service, $itemList);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
-            $expected,
+            5,
             $packed->count(),
-            "Should have been able to fit maximum $expected "
+            "Should have been able to fit a maximum of 5 "
             . "items in this service box."
         );
     }
@@ -174,11 +217,11 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
      * We expect this test to fail to pack all the boxes. More specifically,
      * given our Box/Service dimensions we expect 5 boxes to fit in here...
      */
-    public function testPackFailFour()
+    public function testEasyFit()
     {
         $mod = 1;
-        $service = new StdBox(
-            "Two Item Service",
+        $service = new TestBox(
+            "10 Item Service",
             self::SERVICE_WIDTH / $mod,
             self::SERVICE_LENGTH / $mod,
             self::SERVICE_HEIGHT / $mod,
@@ -190,11 +233,13 @@ class TemandoTest extends \PHPUnit_Framework_TestCase
         );
         $itemList = $this->getItemList(1);
         $expected = $itemList->count() / $mod;
-        $packed = $this->packer->packBox($service, $itemList);
+        $packer = new Packer();
+        $packer->setAllowPartialResults(true);
+        $packed = $packer->packBox($service, $itemList);
         $this->assertEquals(
-            $expected,
+            1,
             $packed->count(),
-            "Should have been able to fit maximum $expected "
+            "Should have been able to fit a maximum of 10 "
             . "items in this service box."
         );
     }
