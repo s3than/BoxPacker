@@ -43,7 +43,7 @@ class Packer implements LoggerAwareInterface {
    */
   protected $allowPartialResults = false;
 
-  protected $limitedBoxes = false;
+  protected $areBoxesLimited = false;
 
   /**
    * Constructor
@@ -109,8 +109,8 @@ class Packer implements LoggerAwareInterface {
    *
    * @param bool $limited
    */
-  public function setLimitedBoxes($limited = true) {
-    $this->limitedBoxes = $limited;
+  public function setBoxesLimited($limited = true) {
+    $this->areBoxesLimited = $limited;
   }
 
   /**
@@ -118,8 +118,8 @@ class Packer implements LoggerAwareInterface {
    *
    * @return bool
    */
-  public function areLimitedBoxes() {
-    return $this->limitedBoxes;
+  public function areBoxesLimited() {
+    return $this->areBoxesLimited;
   }
 
   /**
@@ -129,7 +129,11 @@ class Packer implements LoggerAwareInterface {
    * @return PackedBoxList
    */
   public function pack() {
-    $packedBoxes = $this->doVolumePacking();
+    if ($this->areBoxesLimited()) {
+      $packedBoxes = $this->doVolumePackingWithLimitedBoxes();
+    } else {
+      $packedBoxes = $this->doVolumePacking();
+    }
 
     //If we have multiple boxes, try and optimise/even-out weight distribution
     if ($packedBoxes->count() > 1) {
@@ -148,19 +152,52 @@ class Packer implements LoggerAwareInterface {
    */
   public function doVolumePacking() {
     $packedBoxes = new PackedBoxList;
-    if ($this->areLimitedBoxes()) {
-      $boxesToEvaluate = $this->boxes;
+    //Keep going until everything packed
+    while ($this->items->count()) {
+      $boxesToEvaluate = clone $this->boxes;
+      $packedBoxesIteration = new PackedBoxList;
+
+      //Loop through boxes starting with smallest, see what happens
+      while (!$boxesToEvaluate->isEmpty()) {
+        $box = $boxesToEvaluate->extract();
+
+        $packedBox = $this->packIntoBox($box, clone $this->items);
+
+        if ($packedBox->getItems()->count()) {
+          $packedBoxesIteration->insert($packedBox);
+
+          //Have we found a single box that contains everything?
+          if ($packedBox->getItems()->count() === $this->items->count()) {
+            break;
+          }
+        }
+      }
+
+      //Check iteration was productive
+      if ($packedBoxesIteration->isEmpty()) {
+        throw new \RuntimeException('Item ' . $this->items->top()->getDescription() . ' is too large to fit into any box');
+      }
+
+      //Find best box of iteration, and remove packed items from unpacked list
+      $bestBox = $packedBoxesIteration->top();
+      for ($i = 0; $i < $bestBox->getItems()->count(); $i++) {
+        $this->items->extract();
+      }
+      $packedBoxes->insert($bestBox);
+
     }
+
+    return $packedBoxes;
+  }
+
+  public function doVolumePackingWithLimitedBoxes() {
+    $packedBoxes = new PackedBoxList;
+    $boxesToEvaluate = $this->boxes;
     $isContainer = false;
 
     //Keep going until everything packed
     while ($this->items->count()) {
-      if (!$this->areLimitedBoxes()) {
-        $boxesToEvaluate = clone $this->boxes;
-      }
-
       $packedBoxesIteration = new PackedBoxList;
-
       //Loop through boxes starting with smallest, see what happens
       while (!$boxesToEvaluate->isEmpty()) {
         $box = $boxesToEvaluate->extract();
@@ -170,7 +207,11 @@ class Packer implements LoggerAwareInterface {
           $isContainer = true;
         }
         $packedBox = $this->packIntoBox($box, clone $this->items);
+
         if ($packedBox->getItems()->count()) {
+          for ($i = 0; $i < $packedBox->getItems()->count(); $i++) {
+            $this->items->extract();
+          }
           $packedBoxesIteration->insert($packedBox);
 
           //Have we found a single box that contains everything?
@@ -189,12 +230,11 @@ class Packer implements LoggerAwareInterface {
         }
       }
 
-      //Find best box of iteration, and remove packed items from unpacked list
-      $bestBox = $packedBoxesIteration->top();
-      for ($i = 0; $i < $bestBox->getItems()->count(); $i++) {
-        $this->items->extract();
+      //Find best box of iteration, and remove packed boxes from unpacked list
+      while (!$packedBoxesIteration->isEmpty()) {
+        $bestBox = $packedBoxesIteration->extract();
+        $packedBoxes->insert($bestBox);
       }
-      $packedBoxes->insert($bestBox);
 
     }
 
