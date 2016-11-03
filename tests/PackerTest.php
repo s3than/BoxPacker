@@ -508,7 +508,7 @@
       $item4 = new TestItem('Item 2', 25000, 25000, 20, 2000);
 
       $packer = new Packer();
-      $packer->setLimitedBoxes(true);
+      $packer->setBoxesLimited(true);
       $packer->addBox($box1);
       $packer->addItem($item1);
       $packer->addItem($item2);
@@ -538,7 +538,7 @@
       $item4 = new TestItem('Item 2', 25000, 25000, 20, 2000);
 
       $packer = new Packer();
-      $packer->setLimitedBoxes(true);
+      $packer->setBoxesLimited(true);
       $packer->addBox($box1);
       $packer->addItem($item1);
       $packer->addItem($item2);

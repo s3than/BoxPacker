@@ -192,6 +192,9 @@ class Packer implements LoggerAwareInterface {
 
   public function doVolumePackingWithLimitedBoxes() {
     $packedBoxes = new PackedBoxList;
+    if ($this->boxes->isEmpty()) {
+      return $packedBoxes;
+    }
     $boxesToEvaluate = $this->boxes;
     $isContainer = false;
 
