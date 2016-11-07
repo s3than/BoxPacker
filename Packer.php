@@ -212,10 +212,10 @@ class Packer implements LoggerAwareInterface {
         $packedBox = $this->packIntoBox($box, clone $this->items);
 
         if ($packedBox->getItems()->count()) {
+          $packedBoxesIteration->insert($packedBox);
           for ($i = 0; $i < $packedBox->getItems()->count(); $i++) {
             $this->items->extract();
           }
-          $packedBoxesIteration->insert($packedBox);
 
           //Have we found a single box that contains everything?
           if ($packedBox->getItems()->count() === $this->items->count()) {
@@ -345,7 +345,12 @@ class Packer implements LoggerAwareInterface {
       $itemToPack = $aItems->top();
 
       if ($itemToPack->getDepth() > $remainingDepth || ( $remainingWeight !== null && $itemToPack->getWeight() > $remainingWeight)) {
-        break;
+        if ($aBox->getBoxType() === 'container') {
+          $aItems->extract();
+          continue;
+        } else {
+          break;
+        }
       }
 
       $this->logger->log(LogLevel::DEBUG,  "evaluating item {$itemToPack->getDescription()}");
