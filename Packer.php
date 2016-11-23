@@ -529,4 +529,22 @@ class Packer implements LoggerAwareInterface {
     $packedBox = $this->packIntoBox($aBox, $aItems);
     return $packedBox->getItems();
   }
+
+  /**
+   * Try to fit a list of items into given box and return true or false if fit or does'nt
+   *
+   * @param Box $aBox
+   * @param ItemList $aItems
+   * @return bool
+   */
+  public function fitsInBox(Box $aBox, ItemList $aItems) {
+    /** @var ItemList $items */
+    $items = $this->packBox($aBox, $aItems);
+
+    if ($items->count()) {
+      return true;
+    }
+
+    return false;
+  }
 }
