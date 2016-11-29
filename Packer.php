@@ -511,7 +511,7 @@ class Packer implements LoggerAwareInterface {
         /** @var ItemList $items */
         $items = $this->packBox($aBox, $aItems);
 
-        if ($items->count()) {
+        if ($items->count() === $aItems->count()) {
             return true;
         }
 
