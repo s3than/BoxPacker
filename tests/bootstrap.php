@@ -9,7 +9,7 @@
 
   class TestBox implements Box {
 
-    public function __construct($aReference, $aOuterWidth,$aOuterLength,$aOuterDepth,$aEmptyWeight,$aInnerWidth,$aInnerLength,$aInnerDepth,$aMaxWeight,$boxType='package') {
+    public function __construct($aReference, $aOuterWidth,$aOuterLength,$aOuterDepth,$aEmptyWeight,$aInnerWidth,$aInnerLength,$aInnerDepth,$aMaxWeight) {
       $this->reference = $aReference;
       $this->outerWidth = $aOuterWidth;
       $this->outerLength = $aOuterLength;
@@ -20,7 +20,6 @@
       $this->innerDepth = $aInnerDepth;
       $this->maxWeight = $aMaxWeight;
       $this->innerVolume = $this->innerWidth * $this->innerLength * $this->innerDepth;
-      $this->boxType = $boxType;
     }
 
     public function getReference() {
@@ -61,20 +60,6 @@
 
     public function getMaxWeight() {
       return $this->maxWeight;
-    }
-
-    public function hasMaxWeight()
-    {
-      if ($this->getMaxWeight() !== null) {
-        return true;
-      }
-
-      return false;
-    }
-
-    public function getBoxType()
-    {
-      return $this->boxType;
     }
   }
 
