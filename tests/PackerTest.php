@@ -552,24 +552,4 @@
       self::assertEquals($box1, $packedBoxes->top()->getBox());
       self::assertEquals(4100, $packedBoxes->top()->getWeight());
     }
-
-    public function testFitsInBoxReturnTrueOrFalse() {
-
-      $box = new TestBox('Le box', 300, 300, 105, 10, 296, 296, 8, 1000);
-
-      $items = new ItemList;
-      $items->insert(new TestItem('Item 1', 250, 350, 100, 200));
-
-      $packer = new Packer();
-
-      self::assertFalse($packer->fitsInBox($box, $items));
-
-      $items = new ItemList;
-      $items->insert(new TestItem('Item 1', 250, 150, 5, 200));
-
-      $packer = new Packer();
-
-      self::assertTrue($packer->fitsInBox($box, $items));
-    }
-
   }
