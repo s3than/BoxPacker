@@ -190,58 +190,38 @@ class Packer implements LoggerAwareInterface {
         return $packedBoxes;
     }
 
+    /**
+     * Pack items into boxes using the principle of largest volume item first - with limited provided boxes
+     *
+     * @return PackedBoxList
+     */
     public function doVolumePackingWithLimitedBoxes() {
         $packedBoxes = new PackedBoxList;
         if ($this->boxes->isEmpty()) {
             return $packedBoxes;
         }
-        $boxesToEvaluate = $this->boxes;
-        $isContainer = false;
+        $boxesToEvaluate = clone $this->boxes;
 
-        //Keep going until everything packed
-        while ($this->items->count()) {
-            $packedBoxesIteration = new PackedBoxList;
-            //Loop through boxes starting with smallest, see what happens
-            while (!$boxesToEvaluate->isEmpty()) {
-                $box = $boxesToEvaluate->extract();
+        while (!$boxesToEvaluate->isEmpty()) {
+            $box = $boxesToEvaluate->extract();
 
-                // because we only build nests first and then refresh the packer - therefore if 1 box is container then all boxes are containers
-                if ($this->areBoxesLimited()) {
-                    $isContainer = true;
+            $packedBox = $this->packIntoBox($box, clone $this->items);
+
+            if (!$packedBox->getItems()->isEmpty()) {
+                for ($i = 0; $i < $packedBox->getItems()->count(); $i++) {
+                    $this->items->extract();
                 }
-                $packedBox = $this->packIntoBox($box, clone $this->items);
 
-                if ($packedBox->getItems()->count()) {
-                    $packedBoxesIteration->insert($packedBox);
-                    for ($i = 0; $i < $packedBox->getItems()->count(); $i++) {
-                        $this->items->extract();
-                    }
+                $packedBoxes->insert($packedBox);
 
-                    //Have we found a single box that contains everything?
-                    if ($packedBox->getItems()->count() === $this->items->count()) {
-                        break;
-                    }
+                if ($this->items->isEmpty()) {
+                    break;
                 }
             }
-
-            //Check iteration was productive
-            if ($packedBoxesIteration->isEmpty()) {
-                if ($isContainer) {
-                    return $packedBoxes;
-                } else {
-                    throw new \RuntimeException('Item ' . $this->items->top()->getDescription() . ' is too large to fit into any box');
-                }
-            }
-
-            //Find best box of iteration, and remove packed boxes from unpacked list
-            while (!$packedBoxesIteration->isEmpty()) {
-                $bestBox = $packedBoxesIteration->extract();
-                $packedBoxes->insert($bestBox);
-            }
-
         }
 
         return $packedBoxes;
+
     }
 
     /**
@@ -344,12 +324,7 @@ class Packer implements LoggerAwareInterface {
             $itemToPack = $aItems->top();
 
             if ($itemToPack->getDepth() > $remainingDepth || ( $remainingWeight !== null && $itemToPack->getWeight() > $remainingWeight)) {
-                if ($this->areBoxesLimited()) {
-                    $aItems->extract();
-                    continue;
-                } else {
-                    break;
-                }
+                break;
             }
 
             $this->logger->log(LogLevel::DEBUG,  "evaluating item {$itemToPack->getDescription()}");
@@ -364,12 +339,7 @@ class Packer implements LoggerAwareInterface {
             $isRotateVertical = $itemToPack instanceof RotateItemInterface && $itemToPack->isRotateVertical();
 
             if (false === $isRotateVertical && $itemToPack->getDepth() > $remainingDepth) {
-                if ($this->areBoxesLimited()) {
-                    $aItems->extract();
-                    continue;
-                } else {
-                    break;
-                }
+                break;
             }
 
             $fitsSameGap = min($remainingWidth - $itemWidth, $remainingLength - $itemLength);
@@ -528,5 +498,23 @@ class Packer implements LoggerAwareInterface {
     public function packBox(Box $aBox, ItemList $aItems) {
         $packedBox = $this->packIntoBox($aBox, $aItems);
         return $packedBox->getItems();
+    }
+
+    /**
+     * Try to fit a list of items into given box and return true or false if fit or does'nt
+     *
+     * @param Box $aBox
+     * @param ItemList $aItems
+     * @return bool
+     */
+    public function fitsInBox(Box $aBox, ItemList $aItems) {
+        /** @var ItemList $items */
+        $items = $this->packBox($aBox, $aItems);
+
+        if ($items->count() === $aItems->count()) {
+            return true;
+        }
+
+        return false;
     }
 }
