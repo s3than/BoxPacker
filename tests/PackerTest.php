@@ -500,7 +500,7 @@
      */
     public function testPackingItemsIntoContainerWithoutMaxWeight() {
 
-      $box1 = new TestBox('Le grande box1', 3000, 3000, 100, 100, 2960, 2960, 80, null);
+      $box1 = new TestBox('Le grande box1', 3000, 3000, 100, 100, 2960, 2960, 80, null, 'container');
 
       $item1 = new TestItem('Item 1', 2500, 2500, 20, 2000);
       $item2 = new TestItem('Item 2', 2500, 2500, 20, 2000);
@@ -530,7 +530,7 @@
      */
     public function testPackingItemsIntoContainerWithMaxWeight() {
 
-      $box1 = new TestBox('Le grande box1', 3000, 3000, 100, 100, 2960, 2960, 80, 4500);
+      $box1 = new TestBox('Le grande box1', 3000, 3000, 100, 100, 2960, 2960, 80, 4500, 'container');
 
       $item1 = new TestItem('Item 1', 2500, 2500, 20, 2000);
       $item2 = new TestItem('Item 2', 2500, 2500, 20, 2000);

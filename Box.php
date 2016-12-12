@@ -73,4 +73,17 @@ interface Box {
    */
   public function getMaxWeight();
 
+  /**
+   * Returns bool if a box has max weight value or not
+   * @return bool
+   */
+  public function hasMaxWeight();
+
+  /**
+   * Returns box type
+   *
+   * @return string
+   */
+  public function getBoxType();
+
 }
