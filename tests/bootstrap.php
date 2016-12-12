@@ -9,7 +9,7 @@
 
   class TestBox implements Box {
 
-    public function __construct($aReference, $aOuterWidth,$aOuterLength,$aOuterDepth,$aEmptyWeight,$aInnerWidth,$aInnerLength,$aInnerDepth,$aMaxWeight,$boxType='package') {
+    public function __construct($aReference, $aOuterWidth,$aOuterLength,$aOuterDepth,$aEmptyWeight,$aInnerWidth,$aInnerLength,$aInnerDepth,$aMaxWeight) {
       $this->reference = $aReference;
       $this->outerWidth = $aOuterWidth;
       $this->outerLength = $aOuterLength;
@@ -20,7 +20,6 @@
       $this->innerDepth = $aInnerDepth;
       $this->maxWeight = $aMaxWeight;
       $this->innerVolume = $this->innerWidth * $this->innerLength * $this->innerDepth;
-      $this->boxType = $boxType;
     }
 
     public function getReference() {
@@ -62,56 +61,29 @@
     public function getMaxWeight() {
       return $this->maxWeight;
     }
-
-    public function hasMaxWeight()
-    {
-      if ($this->getMaxWeight() !== null) {
-        return true;
-      }
-
-      return false;
-    }
-
-    public function getBoxType()
-    {
-      return $this->boxType;
-    }
   }
 
-  class TestItem implements RotateItemInterface {
+  class TestItem implements Item {
 
-    public function __construct($aDescription,$aWidth,$aLength,$aDepth,$aWeight,$rotateVertical=false) {
+    public function __construct($aDescription,$aWidth,$aLength,$aDepth,$aWeight) {
       $this->description = $aDescription;
       $this->width = $aWidth;
       $this->length = $aLength;
       $this->depth = $aDepth;
       $this->weight = $aWeight;
       $this->volume = $this->width * $this->length * $this->depth;
-      $this->rotateVertical = $rotateVertical;
     }
 
     public function getDescription() {
       return $this->description;
     }
 
-    public function setWidth($width) {
-      $this->width = $width;
-    }
-
     public function getWidth() {
       return $this->width;
     }
 
-    public function setLength($length) {
-      $this->length = $length;
-    }
-
     public function getLength() {
       return $this->length;
-    }
-
-    public function setDepth($depth) {
-      $this->depth = $depth;
     }
 
     public function getDepth() {
@@ -125,10 +97,5 @@
     public function getVolume() {
       return $this->volume;
     }
-
-    public function isRotateVertical()
-    {
-      return $this->rotateVertical;
-    }
-  }
+ }
 

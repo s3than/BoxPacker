@@ -4,86 +4,73 @@
  * @package BoxPacker
  * @author Doug Wright
  */
-namespace DVDoug\BoxPacker;
-
-/**
- * A "box" (or envelope?) to pack items into
- * @author Doug Wright
- * @package BoxPacker
- */
-interface Box {
+  namespace DVDoug\BoxPacker;
 
   /**
-   * Reference for box type (e.g. SKU or description)
-   * @return string
+   * A "box" (or envelope?) to pack items into
+   * @author Doug Wright
+   * @package BoxPacker
    */
-  public function getReference();
+  interface Box {
 
-  /**
-   * Outer width in mm
-   * @return int
-   */
-  public function getOuterWidth();
+    /**
+     * Reference for box type (e.g. SKU or description)
+     * @return string
+     */
+    public function getReference();
 
-  /**
-   * Outer length in mm
-   * @return int
-   */
-  public function getOuterLength();
+    /**
+     * Outer width in mm
+     * @return int
+     */
+    public function getOuterWidth();
 
-  /**
-   * Outer depth in mm
-   * @return int
-   */
-  public function getOuterDepth();
+    /**
+     * Outer length in mm
+     * @return int
+     */
+    public function getOuterLength();
 
-  /**
-   * Empty weight in g
-   * @return int
-   */
-  public function getEmptyWeight();
+    /**
+     * Outer depth in mm
+     * @return int
+     */
+    public function getOuterDepth();
 
-  /**
-   * Inner width in mm
-   * @return int
-   */
-  public function getInnerWidth();
+    /**
+     * Empty weight in g
+     * @return int
+     */
+    public function getEmptyWeight();
 
-  /**
-   * Inner length in mm
-   * @return int
-   */
-  public function getInnerLength();
+    /**
+     * Inner width in mm
+     * @return int
+     */
+    public function getInnerWidth();
 
-  /**
-   * Inner depth in mm
-   * @return int
-   */
-  public function getInnerDepth();
+    /**
+     * Inner length in mm
+     * @return int
+     */
+    public function getInnerLength();
 
-  /**
-   * Total inner volume of packing in mm^3
-   * @return int
-   */
-  public function getInnerVolume();
+    /**
+     * Inner depth in mm
+     * @return int
+     */
+    public function getInnerDepth();
 
-  /**
-   * Max weight the packaging can hold in g
-   * @return int
-   */
-  public function getMaxWeight();
+    /**
+     * Total inner volume of packing in mm^3
+     * @return int
+     */
+    public function getInnerVolume();
 
-  /**
-   * Returns bool if a box has max weight value or not
-   * @return bool
-   */
-  public function hasMaxWeight();
+    /**
+     * Max weight the packaging can hold in g
+     * @return int
+     */
+    public function getMaxWeight();
 
-  /**
-   * Returns box type
-   *
-   * @return string
-   */
-  public function getBoxType();
-
-}
+  }
