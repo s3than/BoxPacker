@@ -114,7 +114,7 @@ class Packer implements LoggerAwareInterface {
   }
 
   /**
-   * Boolean If boxes are limited or not | It also determines if packer is doing nesting or not
+   * Boolean If building nests or not
    *
    * @return bool
    */
@@ -206,7 +206,7 @@ class Packer implements LoggerAwareInterface {
         $box = $boxesToEvaluate->extract();
 
         // because we only build nests first and then refresh the packer - therefore if 1 box is container then all boxes are containers
-        if ($this->areBoxesLimited()) {
+        if ($box->getBoxType() === 'container') {
           $isContainer = true;
         }
         $packedBox = $this->packIntoBox($box, clone $this->items);
@@ -333,7 +333,7 @@ class Packer implements LoggerAwareInterface {
     $packedItems = new ItemList;
     $remainingDepth = $aBox->getInnerDepth();
     $remainingWeight = null;
-    if ($aBox->getMaxWeight() !== null) {
+    if ($aBox->hasMaxWeight()) {
       $remainingWeight = $aBox->getMaxWeight() - $aBox->getEmptyWeight();
     }
     $remainingWidth = $aBox->getInnerWidth();
@@ -341,10 +341,11 @@ class Packer implements LoggerAwareInterface {
 
     $layerWidth = $layerLength = $layerDepth = 0;
     while(!$aItems->isEmpty()) {
+
       $itemToPack = $aItems->top();
 
       if ($itemToPack->getDepth() > $remainingDepth || ( $remainingWeight !== null && $itemToPack->getWeight() > $remainingWeight)) {
-        if ($this->areBoxesLimited()) {
+        if ($aBox->getBoxType() === 'container') {
           $aItems->extract();
           continue;
         } else {
@@ -364,12 +365,7 @@ class Packer implements LoggerAwareInterface {
       $isRotateVertical = $itemToPack instanceof RotateItemInterface && $itemToPack->isRotateVertical();
 
       if (false === $isRotateVertical && $itemToPack->getDepth() > $remainingDepth) {
-        if ($this->areBoxesLimited()) {
-          $aItems->extract();
-          continue;
-        } else {
-          break;
-        }
+        break;
       }
 
       $fitsSameGap = min($remainingWidth - $itemWidth, $remainingLength - $itemLength);
