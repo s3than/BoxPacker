@@ -205,11 +205,12 @@ class Packer implements LoggerAwareInterface {
     $boxesToEvaluate = clone $this->boxes;
 
     while (!$boxesToEvaluate->isEmpty()) {
-      $box = $boxesToEvaluate->extract();
+      $box = $boxesToEvaluate->top();
 
       $packedBox = $this->packIntoBox($box, clone $this->items);
 
       if (!$packedBox->getItems()->isEmpty()) {
+        $boxesToEvaluate->extract();
         for ($i = 0; $i < $packedBox->getItems()->count(); $i++) {
           $this->items->extract();
         }
@@ -219,6 +220,13 @@ class Packer implements LoggerAwareInterface {
         if ($this->items->isEmpty()) {
           break;
         }
+      } else {
+        $this->items->extract();
+        if ($this->items->isEmpty()) {
+          break;
+        }
+        
+        continue;
       }
     }
 
