@@ -592,4 +592,24 @@
       self::assertEquals($box2, $packedBoxes->top()->getBox());
       self::assertEquals(405, $packedBoxes->top()->getWeight());
     }
+
+    public function testNothingFitsInBoxesDoesNotThrowError() {
+
+        $box1 = new TestBox('Le smallest box', 140, 210, 120, 500, 138, 208, 118, 50000);
+        $box2 = new TestBox('Le smallest box', 140, 210, 120, 200, 100, 100, 80, 50000);
+
+        $item1 = new TestItem('Item 1', 230, 300, 150, 205);
+        $item2 = new TestItem('Item 1', 300, 189, 550, 500);
+
+        $packer = new Packer();
+        $packer->addBox($box1);
+        $packer->addBox($box2);
+        $packer->addItem($item1);
+        $packer->addItem($item2);
+
+        $packer->setBoxesLimited(true);
+        $packedBoxes = $packer->pack();
+
+        self::assertEquals(0, $packedBoxes->count());
+    }
   }
