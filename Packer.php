@@ -136,7 +136,7 @@ class Packer implements LoggerAwareInterface {
     }
 
     //If we have multiple boxes, try and optimise/even-out weight distribution
-    if ($packedBoxes->count() > 1) {
+    if ($packedBoxes->count() > 1 && !$this->areBoxesLimited()) {
       $packedBoxes = $this->redistributeWeight($packedBoxes);
     }
 
